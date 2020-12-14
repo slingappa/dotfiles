@@ -119,3 +119,10 @@ set nomodeline
 
 " ================ Custom Settings ========================
 so ~/.yadr/vim/settings.vim
+
+set t_Co=256
+
+" set background=light
+set background=dark
+colorscheme PaperColor
+let g:csv_no_conceal = 1
