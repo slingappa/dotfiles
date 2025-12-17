@@ -1,0 +1,15 @@
+.zsh_history
+.zcompdump*
+.bash_history
+.cache/
+.local/
+.cargo/
+.npm/
+.ssh/
+.pki/
+.vnc/
+*secrets*
+.Xauthority
+.dbus/
+.anydesk/
+.rnd

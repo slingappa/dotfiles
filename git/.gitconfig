@@ -1,0 +1,30 @@
+[includeIf "gitdir:~/git_personal/"]
+	  path = ~/.gitconfig_personal
+[includeIf "gitdir:~/.oh-my-zsh/"]
+	  path = ~/.gitconfig_personal
+[includeIf "gitdir:~/git/"]
+	  path = ~/.gitconfig_work
+[diff]
+	tool = bcompare
+[difftool "bcompare"]
+	trustExitCode = true
+[submodule]
+	recurse = true
+[http]
+	sslCAinfo = /etc/ssl/certs/ca-certificates.crt
+	postBuffer = 2048M
+	version = HTTP/1.1
+	maxRequestBuffer = 1024M
+[user]
+	name = Subrahmanya Lingappa
+	email = slingappa@ventanamicro.com
+[core]
+	compression = 9
+[ssh]
+	postBuffer = 2048M
+	maxRequestBuffer = 1024M
+[pack]
+	windowMemory = 256m
+	packSizeLimit = 256m
+[https]
+	postBuffer = 1048576000
