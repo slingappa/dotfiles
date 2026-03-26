@@ -17,7 +17,7 @@
 	maxRequestBuffer = 1024M
 [user]
 	name = Subrahmanya Lingappa
-	email = slingappa@ventanamicro.com
+	email = subrahmanya.lingappa@qti.qualcomm.com
 [core]
 	compression = 9
 [ssh]
@@ -28,3 +28,5 @@
 	packSizeLimit = 256m
 [https]
 	postBuffer = 1048576000
+[pull]
+	rebase = true

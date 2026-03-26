@@ -504,3 +504,36 @@ set ignorecase
 
 " command Log colorscheme elflord | %s/\[39m//g | AnsiEsc
 nmap <Esc>s :set paste<CR>
+
+" Use Ctrl-Q for Visual Block mode instead of Ctrl-V
+nnoremap <C-Q> <C-V>
+vnoremap <C-Q> <C-V>
+inoremap <C-Q> <C-V>
+
+
+" Change cursor shape on different mode if empty($TMUX) or using Byobu (which sets $BYOBU_TMUX)
+if empty($TMUX) && empty($BYOBU_TMUX)
+  " Outside tmux/byobu (e.g., iTerm2)
+  let &t_SI = "\<Esc>]50;CursorShape=1\<x7>" " Vertical bar in insert mode
+  let &t_EI = "\<Esc>]50;CursorShape=0\<x7>" " Block in normal mode
+  let &t_SR = "\<Esc>]50;CursorShape=2\<x7>" " Underline in replace mode
+else
+  " Inside tmux/byobu
+  " The numbers correspond to: 1/2=block, 3/4=underline, 5/6=vertical bar
+  " Odd numbers = blinking, Even numbers = steady
+  let &t_SI = "\<Esc>[5 q" " Blinking vertical bar in insert mode
+  let &t_EI = "\<Esc>[1 q" " Blinking block in normal mode
+  let &t_SR = "\<Esc>[3 q" " Blinking underline in replace mode
+endif
+
+" Ensure cursor shape persists when switching panes/windows in tmux/byobu
+" by wrapping escape codes in a special tmux sequence: \ePtmux;\e...\e\\
+if exists('$TMUX') || exists('$BYOBU_TMUX')
+  let &t_EI = "\<Esc>Ptmux;\<Esc>\<Esc>[1 q\<Esc>\\"
+  let &t_SI = "\<Esc>Ptmux;\<Esc>\<Esc>[5 q\<Esc>\\"
+  let &t_SR = "\<Esc>Ptmux;\<Esc>\<Esc>[3 q\<Esc>\\"
+endif
+
+let &t_SI = "\<Esc>]50;CursorShape=1\<x7>" " Vertical bar in insert mode
+let &t_EI = "\<Esc>]50;CursorShape=0\<x7>" " Block in normal mode
+let &t_SR = "\<Esc>]50;CursorShape=2\<x7>" " Underline in replace mode
