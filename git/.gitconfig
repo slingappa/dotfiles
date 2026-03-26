@@ -2,6 +2,8 @@
 	  path = ~/.gitconfig_personal
 [includeIf "gitdir:~/.oh-my-zsh/"]
 	  path = ~/.gitconfig_personal
+[includeIf "gitdir:~/dotfiles/"]
+	  path = ~/.gitconfig_personal
 [includeIf "gitdir:~/git/"]
 	  path = ~/.gitconfig_work
 [diff]
