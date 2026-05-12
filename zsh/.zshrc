@@ -1,3 +1,4 @@
+
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
@@ -82,9 +83,39 @@ ZSH_THEME="agnoster"
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
 #plugins=(git)
-plugins=(git z zsh-autosuggestions colored-man-pages command-not-found extract zsh-history-substring-search pass taskwarrior web-search)
+plugins=(git z zsh-autosuggestions colored-man-pages command-not-found extract zsh-history-substring-search pass taskwarrior web-search ohmyzsh-full-autoupdate)
+
+autoload -U colors && colors
 
 source $ZSH/oh-my-zsh.sh
+
+# Optional local-only secrets file (not committed to git).
+[[ -f "$HOME/.config/shell/private.zsh" ]] && source "$HOME/.config/shell/private.zsh"
+
+# Auto-save Codex/QGenie interactive sessions to ~/workspace/chatlogs/codex.
+# Set CODEX_CHATLOG_DISABLE=1 to bypass for one shell/session.
+function qgenie() {
+  local qgenie_real="/usr2/slingapp/.local/bin/qgenie"
+  local subcmd="$1"
+
+  if [[ ! -x "$qgenie_real" ]]; then
+    command qgenie "$@"
+    return $?
+  fi
+
+  if [[ -o interactive ]] \
+    && [[ -z "${CODEX_CHATLOG_DISABLE:-}" ]] \
+    && [[ -z "${INSIDE_CODEX_CHATLOG_SCRIPT:-}" ]] \
+    && [[ "$subcmd" == "agent" || "$subcmd" == "chat" || "$subcmd" == "resume" || "$subcmd" == "fork" ]]; then
+    mkdir -p "$HOME/workspace/chatlogs/codex"
+    export INSIDE_CODEX_CHATLOG_SCRIPT=1
+    local codex_chatlog="$HOME/workspace/chatlogs/codex/session-$(date +%F_%H-%M-%S).log"
+    script -qf "$codex_chatlog" -c "$qgenie_real ${(q)@}"
+    return $?
+  fi
+
+  "$qgenie_real" "$@"
+}
 
 # User configuration
 
@@ -145,7 +176,9 @@ alias ll='ls -alF'
 alias ls='ls --color=auto'
 alias ta='TERM=screen-256color-bce tmux -CC new-session -A -s '
 alias tl='telnet localhost 45454'
-alias totp='oathtool  -b --totp 7C232KQQYRLSQ4RPMJZ24BNTCEYPWI7G'
+if [[ -n "${TOTP_SECRET:-}" ]]; then
+  alias totp='oathtool -b --totp "$TOTP_SECRET"'
+fi
 alias pdf='xdg-open '
 #alias qvm="ssh root@localhost -p2222"
 alias vm='ssh slingappa@ventana-vm-128'
@@ -204,8 +237,144 @@ function tmux-connect {
 
 export ARCH=riscv
 export CROSS_COMPILE=riscv64-unknown-linux-gnu-
-export PATH=/home/redpanda/git/caliptra_demo//qemu/build:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/home/redpanda/bin:/usr/local/bin:/home/redpanda/.cargo/bin:/home/redpanda/local/bin:/home/redpanda/.local/bin
+export PATH=/home/redpanda/git/caliptra_demo//qemu/build:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/home/redpanda/bin:/usr/local/bin:/home/redpanda/.cargo/bin:/home/redpanda/local/bin:/home/redpanda/.local/bin:/usr2/slingapp/.local/bin
+
+alias sd='~/bin/sd.sh'
+alias duhome="du -sh ~/* ~/.??* 2>/dev/null | sort -h"
+alias kl="sd; ~/bin/kl.sh"
 
 #export PAGER="vim -R +AnsiEsc"
 #cd /home/redpanda/git/ventana_openbmc_ws
+# Autostart Tmux session if not already attached
+#if ! pgrep -x tmux > /dev/null
+#then
+#    tmux new-session -d -s main || true
+#    tmux attach-session -t main
+#else
+#    tmux attach-session || true
+#fi
 
+## Disable shared history between all sessions/panes
+#unsetopt share_history
+#
+## Set a unique history file for each tmux pane
+#if [[ -n "$TMUX_PANE" ]]; then
+#  HISTFILE=$HOME/.zsh_history_dir/tmux_$(echo "$TMUX_PANE" | tr -d '%:')
+#else
+#  # Fallback for sessions outside of tmux
+#  HISTFILE=$HOME/.zsh_history
+#fi
+#
+## Recommended history options
+#setopt inc_append_history   # Immediately append history to the history file
+#setopt hist_ignore_dups     # Ignore duplicate commands
+#setopt hist_ignore_space    # Ignore commands starting with a space
+#setopt hist_save_nodups     # Don't save dups to the history file
+#setopt hist_expire_dups_first # Remove older duplicate entries first
+#
+
+# --- History sizing (optional but recommended) ---
+# Keep enough history in memory and on disk
+HISTSIZE=${HISTSIZE:-100000}
+SAVEHIST=${SAVEHIST:-100000}
+
+# Keep timestamps for better merging and auditing
+setopt extended_history
+
+# Your recommended history options (kept as-is)
+setopt inc_append_history     # Immediately append commands to $HISTFILE
+setopt hist_ignore_dups       # Ignore duplicate commands in a row
+setopt hist_ignore_space      # Ignore commands starting with space
+setopt hist_save_nodups       # Don't save dups to the history file
+setopt hist_expire_dups_first # Remove older duplicate entries first
+
+# --- Paths ---
+: ${ZSH_GLOBAL_HIST:="$HOME/.zsh_history"}
+: ${ZSH_PANE_HIST_DIR:="$HOME/.zsh_history_dir"}
+mkdir -p -- "$ZSH_PANE_HIST_DIR"
+
+# --- 1) Import global history into this shell's memory at startup ---
+# Do this BEFORE pointing HISTFILE to a per-pane file so we don't write global into pane file.
+if [[ -s "$ZSH_GLOBAL_HIST" ]]; then
+  builtin fc -R -- "$ZSH_GLOBAL_HIST"
+fi
+
+# --- 2) Use a per-pane history file inside tmux ---
+if [[ -n "$TMUX_PANE" ]]; then
+  # Sanitize pane ID to be filesystem-safe (zsh substitution removes % and :)
+  pane_id="${TMUX_PANE//[%:]/}"
+  export HISTFILE="$ZSH_PANE_HIST_DIR/tmux_${pane_id}"
+else
+  export HISTFILE="$ZSH_GLOBAL_HIST"
+fi
+
+# Ensure the active history file exists
+: >| "$HISTFILE"
+
+# --- 3) Merge back into the global history (deduped) ---
+# A tiny lock helper to avoid concurrent writes from multiple panes
+_zsh_hist_lock() {
+  local lock="$ZSH_GLOBAL_HIST.lock"
+  local tries=0
+  # mkdir as a lock (portable); remove on RETURN trap
+  until mkdir "$lock" 2>/dev/null; do
+    (( tries++ > 100 )) && return 1  # ~5s max wait
+    sleep 0.05
+  done
+  # When the function returns, remove the lock
+  trap 'rmdir "$lock"' RETURN
+  return 0
+}
+
+# Merge current pane's history (and existing global) into a clean global history.
+# We use a child zsh to apply zsh's own history rules while writing.
+zsh_hist_merge_global() {
+  [[ -w "$ZSH_GLOBAL_HIST" || ! -e "$ZSH_GLOBAL_HIST" ]] || return 0
+
+  _zsh_hist_lock || return 0
+
+  # Use a subshell zsh to read both files and write out a de-duplicated global
+  # We include extended_history so timestamps are preserved.
+  command zsh -c '
+    setopt extended_history hist_ignore_dups hist_save_nodups hist_expire_dups_first
+    global="$1"; shift
+    # Read existing global first
+    [[ -s "$global" ]] && builtin fc -R -- "$global"
+    # Then read this pane (if any)
+    for f in "$@"; do
+      [[ -s "$f" ]] && builtin fc -R -- "$f"
+    done
+    # Now write a clean global (overwrites)
+    HISTFILE="$global"
+    builtin fc -W -- "$HISTFILE"
+  ' -- "$ZSH_GLOBAL_HIST" "$HISTFILE" 2>/dev/null
+}
+
+# --- Choose how often to merge back ---
+
+# Option A: Merge back on shell exit (recommended: simple and low overhead)
+autoload -Uz add-zsh-hook
+add-zsh-hook zshexit zsh_hist_merge_global
+
+# Option B: Merge back periodically at each prompt (comment Option A and uncomment this)
+#   This throttles to at most once every 10 seconds to reduce contention.
+#   NOTE: Continuous merging is heavier if you have many panes.
+#last_hist_merge_epoch=0
+#zsh_hist_precmd_merge() {
+#  local now=$EPOCHSECONDS
+#  (( now - ${last_hist_merge_epoch:-0} >= 10 )) || return
+#  last_hist_merge_epoch=$now
+#  zsh_hist_merge_global
+#}
+#add-zsh-hook precmd zsh_hist_precmd_merge
+#
+export PATH=/local/mnt/workspace/ts_ws_0.21.1-rc2/ventana-cross-toolchain-2025.11.18/bin:/usr2/slingapp/workspace/git/dvtools-vt2/build/iss/models/ebba:/usr2/slingapp/.local/bin/:/usr2/slingapp/bin/:${PATH}
+export PATH=/usr2/slingapp/local//bin:$PATH
+
+
+alias sg="GIT_SSH_COMMAND='ssh -i ~/.ssh/slingappa_git/id_rsa -o IdentitiesOnly=yes' git "
+
+# QGenie Environment Variables
+[ -f "/usr2/slingapp/.qgenie/.exports" ] && source "/usr2/slingapp/.qgenie/.exports"
+
+qdbg() { qgenie agent exec -C "$PWD" --sandbox workspace-write "$*"; }

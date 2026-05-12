@@ -8,8 +8,21 @@
 .ssh/
 .pki/
 .vnc/
-*secrets*
+.secrets/
 .Xauthority
 .dbus/
 .anydesk/
 .rnd
+
+# Encrypted secrets workflow (tracked ciphertext + manifest, untracked plaintext/staging)
+secrets/.staging/
+secrets/.decrypted/
+secrets/*.tar
+secrets/*.tar.gz
+secrets/*.tmp
+secrets/*.passphrase
+
+!secrets/
+!secrets/README.md
+!secrets/manifest.txt
+!secrets/*.gpg

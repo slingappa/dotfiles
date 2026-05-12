@@ -31,6 +31,8 @@ Plugin 'VundleVim/Vundle.vim'
 " Plugin 'Valloric/YouCompleteMe'
 Plugin 'vivien/vim-linux-coding-style'
 " Plugin 'jeaye/color_coded'
+Plugin 'tomasr/molokai'
+
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
@@ -537,3 +539,4 @@ endif
 let &t_SI = "\<Esc>]50;CursorShape=1\<x7>" " Vertical bar in insert mode
 let &t_EI = "\<Esc>]50;CursorShape=0\<x7>" " Block in normal mode
 let &t_SR = "\<Esc>]50;CursorShape=2\<x7>" " Underline in replace mode
+

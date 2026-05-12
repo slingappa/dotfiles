@@ -1,0 +1,10 @@
+[user]
+    email = subbukl@gmail.com
+    name = Subrahmanya Lingappa
+[merge]
+    conflictstyle = diff3
+
+[credential]
+    helper = store
+[safe]
+    directory = /home/redpanda/git_personal/code
