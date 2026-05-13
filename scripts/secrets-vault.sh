@@ -32,10 +32,34 @@ require_manifest() {
   fi
 }
 
-gpg_common_args() {
+obtain_passphrase() {
   if [[ -n "${DOTFILES_SECRETS_PASSPHRASE:-}" ]]; then
-    echo "--batch --yes --pinentry-mode loopback --passphrase ${DOTFILES_SECRETS_PASSPHRASE}"
+    printf '%s' "${DOTFILES_SECRETS_PASSPHRASE}"
+    return 0
   fi
+
+  # Fallback interactive prompt when running on a real terminal.
+  if [[ -r /dev/tty ]]; then
+    local p1="" p2=""
+    read -r -s -p "Vault passphrase: " p1 < /dev/tty
+    echo > /dev/tty
+    read -r -s -p "Confirm passphrase: " p2 < /dev/tty
+    echo > /dev/tty
+    if [[ "${p1}" != "${p2}" ]]; then
+      echo "Passphrases do not match." >&2
+      exit 1
+    fi
+    if [[ -z "${p1}" ]]; then
+      echo "Empty passphrase is not allowed." >&2
+      exit 1
+    fi
+    printf '%s' "${p1}"
+    return 0
+  fi
+
+  echo "No TTY detected and DOTFILES_SECRETS_PASSPHRASE is not set." >&2
+  echo "Run with: DOTFILES_SECRETS_PASSPHRASE='...' ./scripts/secrets-vault.sh backup" >&2
+  exit 1
 }
 
 list_manifest() {
@@ -89,9 +113,14 @@ backup_secrets() {
   mkdir -p "${SECRETS_DIR}"
   tmp_archive="${ARCHIVE_FILE}.tmp"
 
-  extra_args="$(gpg_common_args)"
-  # shellcheck disable=SC2086
-  tar -C "${STAGING_DIR}" -cf - . | gpg ${extra_args} --symmetric --cipher-algo AES256 -o "${tmp_archive}"
+  passphrase="$(obtain_passphrase)"
+  exec 3<<<"${passphrase}"
+  tar -C "${STAGING_DIR}" -cf - . | gpg \
+    --batch --yes --pinentry-mode loopback --passphrase-fd 3 \
+    --symmetric --cipher-algo AES256 -o "${tmp_archive}"
+  exec 3<&-
+  unset passphrase
+
   mv -f "${tmp_archive}" "${ARCHIVE_FILE}"
   rm -rf "${STAGING_DIR}"
 
@@ -108,9 +137,11 @@ restore_secrets() {
   rm -rf "${DECRYPT_DIR}"
   mkdir -p "${DECRYPT_DIR}"
 
-  extra_args="$(gpg_common_args)"
-  # shellcheck disable=SC2086
-  gpg ${extra_args} -d "${ARCHIVE_FILE}" | tar -C "${DECRYPT_DIR}" -xf -
+  passphrase="$(obtain_passphrase)"
+  exec 3<<<"${passphrase}"
+  gpg --batch --yes --pinentry-mode loopback --passphrase-fd 3 -d "${ARCHIVE_FILE}" | tar -C "${DECRYPT_DIR}" -xf -
+  exec 3<&-
+  unset passphrase
 
   echo "Decrypted files:"
   (cd "${DECRYPT_DIR}" && find . -mindepth 1 -print | sed 's#^\./##')
