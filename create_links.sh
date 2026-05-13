@@ -20,3 +20,10 @@ ln -sfn dotfiles/zsh/.zshrc .zshrc.pre-oh-my-zsh
 ln -sfn dotfiles/bash/.bashrc .bashrc
 ln -sfn dotfiles/csh/.cshrc.local .cshrc.local
 ln -sfn dotfiles/mtools/.mtoolsrc .mtoolsrc
+
+ln -sfn dotfiles/aspell/.aspell.en.prepl .aspell.en.prepl
+ln -sfn dotfiles/aspell/.aspell.en.pws .aspell.en.pws
+ln -sfn dotfiles/x11/.xsession.local .xsession.local
+ln -sfn dotfiles/shell/.shell.pre-oh-my-zsh .shell.pre-oh-my-zsh
+
+ln -sfn dotfiles/bin bin

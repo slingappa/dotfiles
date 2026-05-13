@@ -1,0 +1,21 @@
+curl 'https://kseeb.karnataka.gov.in/phrvrt24online/Upload_Status.aspx' \
+  -H 'Accept: */*' \
+  -H 'Accept-Language: en-US,en;q=0.9' \
+  -H 'Cache-Control: no-cache' \
+  -H 'Connection: keep-alive' \
+  -H 'Content-Type: application/x-www-form-urlencoded; charset=UTF-8' \
+  -H 'Cookie: AlteonP=D3v6YLodCgrAFOlOoYyHOQ$$' \
+  -H 'DNT: 1' \
+  -H 'Origin: https://kseeb.karnataka.gov.in' \
+  -H 'Referer: https://kseeb.karnataka.gov.in/phrvrt24online/Upload_Status.aspx' \
+  -H 'Sec-Fetch-Dest: empty' \
+  -H 'Sec-Fetch-Mode: cors' \
+  -H 'Sec-Fetch-Site: same-origin' \
+  -H 'User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36' \
+  -H 'X-MicrosoftAjax: Delta=true' \
+  -H 'X-Requested-With: XMLHttpRequest' \
+  -H 'sec-ch-ua: "Google Chrome";v="119", "Chromium";v="119", "Not?A_Brand";v="24"' \
+  -H 'sec-ch-ua-mobile: ?0' \
+  -H 'sec-ch-ua-platform: "Linux"' \
+  --data-raw 'ctl00%24ScriptManager1=ctl00%24ContentPlaceHolder1%24UpdatePanel1%7Cctl00%24ContentPlaceHolder1%24BtnSubmit&__LASTFOCUS=&__EVENTTARGET=&__EVENTARGUMENT=&__VIEWSTATE=yI76EvwZ4rH3394l3NUnaNHVHKtKeYljs%2FwnJWbt7%2BuoJmfbcIIXyqpzvnc0VQRqmVHrJ6qfM9IGlyYuR5xvvcWvucdyZKwxzGasgSDDLUefZXpymFOl6oXYdbAOqVhtRVf9H5MvvJ%2BI80PH8Bj8pc63NVfMDOJ3qrFdA%2BuzGrnOF0HhEocZChvUmXS3OvpCAnep%2FF6%2Bp3AJn52Fu1AdJXvoYtQ5QeMTzCrSswo4zghcVrbiP1zZoPONAmzeOcdhne4Lo4QcnWfGe%2Bh7kpMaRzfRUl54Hh2Qli408sd1Ir4%3D&__VIEWSTATEGENERATOR=42EF6167&__EVENTVALIDATION=naveCLs5LrhjQfPWI773M9fa8kSKaigAdPnDLIl0pRIypzgrwExQXqblvKRc6g8SE6wVUmOuLV0cTPB%2Bsy1JiIDnCldAZkWb6rWGEWVrt0GXwGYY0FblzgOsQfQKTaQRZHNwSEGz0zqImLpV1Mj7Yyqvyp9DHMTXazmFVEWuG%2Fk%3D&ctl00%24ContentPlaceHolder1%24txtboxchallanNo=202404555242103&__ASYNCPOST=true&ctl00%24ContentPlaceHolder1%24BtnSubmit=Submit' \
+  --compressed

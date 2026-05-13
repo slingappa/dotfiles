@@ -1,0 +1,1 @@
+ PABOT_THREADS=4; TEST_ROOT=~/workspace/git/testscripts_robot;  WORKSPACE_DIR=~/workspace/ts_ws_0.21.1-rc1/ventana-sw-0.21.1-rc1; ~/.local/bin/pabot --pabotlib --processes    ${PABOT_THREADS}  -v OBMC_ECHO_TEST:$TEST_ROOT/scripts/obmc_echo_test.sh -v WORKSPACE_DIR:$WORKSPACE_DIR $TEST_ROOT/test_suits/all_tests/

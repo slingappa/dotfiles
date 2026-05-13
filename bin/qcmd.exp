@@ -1,0 +1,29 @@
+#!/usr/bin/expect
+
+set timeout -1
+set prompt "#|%|>|\\\$"; # We escaped the `$` symbol with backslash to match literal '$'
+#set sid [lindex $argv 0]
+set cmd [lindex $argv 0]
+set output " "
+#if {[info exists output]} {
+#unset output
+#}
+#spawn ssh -o StrictHostKeyChecking=accept-new root@localhost -p${sid}2222
+#spawn ssh -o StrictHostKeyChecking=accept-new root@localhost -p2222
+spawn ssh -o StrictHostKeyChecking=accept-new root@localhost -p10084
+#spawn ssh -o StrictHostKeyChecking=accept-new root@localhost -p10024
+#spawn ssh -o StrictHostKeyChecking=accept-new root@localhost -p42222
+expect "password:"
+send "0penBmc\r"
+sleep 2
+#send "\r"
+#set output [exec sh -c {systemctl status systemd-timedated.service || true}]
+#set output [exec sh -c {systemctl status systemd-hostnamed.service || true}]
+#puts $output
+expect -re $prompt
+#send "systemctl status systemd-hostnamed.service\r"
+send "$cmd\r"
+expect -re $prompt
+#puts "The output is '$expect_out(buffer)'."
+#puts ">>>$expect_out(buffer)<<<"
+#interact

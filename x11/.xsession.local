@@ -1,0 +1,46 @@
+#!/bin/sh
+# @(#).xsession.local	1.3 (Qualcomm) 17 Feb 1995
+#
+# Copyright (C) 1995 Qualcomm Incorporated
+#
+# Comment: local xsession file for olvwm based environment
+#
+# Usage: called by /usr/local/etc/xsession.global
+#
+# Known Bugs: 
+#
+# Author: Lee Damon
+#
+#
+
+if [ "x$ARCH" = "xSunOS-4" -o "x$ARCH" = "xSunOS-5" ]
+then
+	# we're on a Sun
+
+	# this will start an xterm in the upper right corner.
+	/usr/openwin/bin/xterm -ls -T $HN -n $HN -geometry -0+0 &
+
+	# this will start an xterm in the lower right corner.
+	/usr/openwin/bin/xterm -ls -T $HN -n $HN -geometry -0-0 &
+
+
+elif [ -x /usr/X11R6/bin/xterm ]
+then
+	# we're on... who cares - we found xterm
+
+	# this will start an xterm in the upper right corner.
+	/usr/X11R6/bin/xterm -ls -T $HN -n $HN -geometry -0+0 &
+
+	# this will start an xterm in the lower right corner.
+	/usr/X11R6/bin/xterm -ls -T $HN -n $HN -geometry -0-0 &
+	
+else
+	# we're on an HP
+
+	# this will start an xterm in the upper right corner.
+	/usr/bin/X11/xterm -tr -ls -T $HN -n $HN -geometry -0+0 &
+
+	# this will start an xterm in the lower right corner.
+	/usr/bin/X11/xterm -tr -ls -T $HN -n $HN -geometry -0-0 &
+	
+fi
