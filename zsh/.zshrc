@@ -378,3 +378,28 @@ alias sg="GIT_SSH_COMMAND='ssh -i ~/.ssh/slingappa_git/id_rsa -o IdentitiesOnly=
 [ -f "/usr2/slingapp/.qgenie/.exports" ] && source "/usr2/slingapp/.qgenie/.exports"
 
 qdbg() { qgenie agent exec -C "$PWD" --sandbox workspace-write "$*"; }
+
+
+# Keep your manual alias too (optional)
+alias sg="GIT_SSH_COMMAND='ssh -i ~/.ssh/slingappa_git/id_rsa -o IdentitiesOnly=yes' git"
+
+git() {
+  local key_cmd="ssh -i ~/.ssh/slingappa_git/id_rsa -o IdentitiesOnly=yes"
+  local remotes
+
+  # 1) For commands that include a URL (e.g. clone)
+  if [[ "$*" == *"git@github.com:slingappa/"* || "$*" == *"git@github.com:slingappa:"* ]]; then
+    GIT_SSH_COMMAND="$key_cmd" command git "$@"
+    return
+  fi
+
+  # 2) For commands run inside an existing repo
+  remotes="$(command git config --get-regexp '^remote\..*\.url$' 2>/dev/null)"
+  if [[ "$remotes" == *"git@github.com:slingappa/"* || "$remotes" == *"git@github.com:slingappa:"* ]]; then
+    GIT_SSH_COMMAND="$key_cmd" command git "$@"
+  else
+    command git "$@"
+  fi
+}
+
+

@@ -221,9 +221,10 @@ set ffs=unix,dos,mac
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Files, backups and undo
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Turn backup off, since most stuff is in SVN, git etc. anyway...
-set nobackup
-set nowb
+" Keep file backups on write.
+set backup
+set writebackup
+set backupdir=~/.vim/backup//
 set noswapfile
 
 
@@ -539,4 +540,3 @@ endif
 let &t_SI = "\<Esc>]50;CursorShape=1\<x7>" " Vertical bar in insert mode
 let &t_EI = "\<Esc>]50;CursorShape=0\<x7>" " Block in normal mode
 let &t_SR = "\<Esc>]50;CursorShape=2\<x7>" " Underline in replace mode
-
